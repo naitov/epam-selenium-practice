@@ -51,22 +51,12 @@ public class PastebinCodeNewPaste {
     public PastebinCodeNewPaste setSyntaxHighlightingToBash() {
         syntaxHighlightingContainer.submit();
         syntaxHighlightingElementBash.submit();
-//        new WebDriverWait(driver, Duration.of(500, ChronoUnit.MILLIS))
-//                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//span[@id='select2-postform-format-container']")))
-//                .click();
-//        new WebDriverWait(driver, Duration.of(500, ChronoUnit.MILLIS))
-//                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//li[text()='Bash']")))
-//                .click();
         return this;
     }
 
     public PastebinCodeNewPaste setExpirationPeriod10Minutes() {
         expirationContainer.submit();
         expirationElement10M.submit();
-//        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-//                .until(ExpectedConditions.elementToBeClickable(expirationContainer)).click();
-//        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-//                .until(ExpectedConditions.elementToBeClickable(expirationElement10M)).click();
         return this;
     }
 
