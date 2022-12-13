@@ -8,9 +8,6 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
 public class WebDrivePastebinCodeTest {
     public WebDriver driver;
     public static final String PAGE_URL = "https://pastebin.com";
@@ -24,7 +21,6 @@ public class WebDrivePastebinCodeTest {
     public void browserSetup() {
         driver = new ChromeDriver();
         driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.of(2, ChronoUnit.SECONDS));
     }
 
     @Test(description = "Asserting equality new paste name to resulting page title")
@@ -36,7 +32,7 @@ public class WebDrivePastebinCodeTest {
                 .setExpirationPeriod10Minutes()
                 .addPasteName(pasteName)
                 .submitNewPaste()
-                .expectThatResultingPageTitleEquals(pasteName));
+                .expectThatResultingPageTitleContains(pasteName));
     }
 
     @Test(description = "Asserting syntax highlighting to Bash")
@@ -61,6 +57,7 @@ public class WebDrivePastebinCodeTest {
                 .setExpirationPeriod10Minutes()
                 .addPasteName(pasteName)
                 .submitNewPaste()
+                .getRawTextPageUrl()
                 .expectThatResultingTextEquals(pasteText));
     }
 

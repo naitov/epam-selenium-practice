@@ -2,43 +2,43 @@ package bring_it_on.page;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PastebinCodeResultPage {
 
     public WebDriver driver;
-
-    @FindBy(xpath = "//a[contains(@href, '/raw/')]")
-    WebElement rawTextLink;
 
     public PastebinCodeResultPage(WebDriver driver) {
         this.driver = driver;
 
     }
 
-    public boolean expectThatResultingPageTitleEquals(String pasteName) {
-        String compositeXpath = "//*[text()='" + pasteName + " - Pastebin.com']";
+    public boolean expectThatResultingPageTitleContains(String pasteName) {
         return new WebDriverWait(driver, Duration.of(5, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.textToBePresentInElementLocated(By
-                        .xpath(compositeXpath), pasteName + " - Pastebin.com"));
+                .until(ExpectedConditions.titleContains(pasteName));
     }
 
     public boolean expectThatSyntaxHighlightingIs(String syntaxToHighlight) {
-        String compositeXpath = "//*[contains(@href,'light/" + syntaxToHighlight + ".css')]";
+        String compositeXpath = "//div[@class='highlighted-code']/div/div/a[text()='" + syntaxToHighlight + "']";
         return new WebDriverWait(driver, Duration.of(5, ChronoUnit.SECONDS))
                        .until(ExpectedConditions.presenceOfElementLocated(By.xpath(compositeXpath))) != null;
     }
 
-    public boolean expectThatResultingTextEquals(String pasteText) {
-        rawTextLink.click();
-        return new WebDriverWait(driver, Duration.of(5, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//pre[@style='word-wrap: break-word; white-space: pre-wrap;']")))
-                .getText().equals(pasteText);
+    public PastebinCodeResultPageRawText getRawTextPageUrl() {
+        String urlToMatch = driver.getCurrentUrl();
+        Pattern pattern = Pattern.compile(".com/");
+        Matcher matcher = pattern.matcher(urlToMatch);
+        StringBuilder resultUrl = new StringBuilder();
+        if (matcher.find()) {
+            matcher.appendReplacement(resultUrl, ".com/raw/");
+        }
+        matcher.appendTail(resultUrl);
+        return new PastebinCodeResultPageRawText(driver, resultUrl.toString());
     }
 }
