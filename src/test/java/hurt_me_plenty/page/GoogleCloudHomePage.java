@@ -1,18 +1,21 @@
 package hurt_me_plenty.page;
 
 import hurt_me_plenty.exceptions.NoSuchResultException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class GoogleCloudHomePage extends Page{
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
-    private String searchTerm;
+public class GoogleCloudHomePage extends Page {
 
-    private WebElement searchButton;
 
+    @FindBy(name = "q")
     private WebElement searchField;
-
-    private WebElement searchResultLink;
 
     public GoogleCloudHomePage(WebDriver driver) {
         super(driver);
@@ -23,17 +26,18 @@ public class GoogleCloudHomePage extends Page{
         return this;
     }
 
-    public GoogleCloudHomePage searchForTerm(String searchTerm) {
-        this.searchTerm = searchTerm;
-        return this;
-    }
+    public GooglePricingCalculatorPageForm searchForTerm(String searchTerm) throws NoSuchResultException {
+        searchField.sendKeys(searchTerm);
+        searchField.submit();
+        WebElement searchResultLink = new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS))
+                .until(ExpectedConditions.elementToBeClickable(By.xpath("//b[text()='Google Cloud Pricing Calculator']/parent::a")));
+        WebElement SearchResultText = new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS))
+                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//b[text()='Google Cloud Pricing Calculator']/parent::a/child::b")));
 
-    public GooglePricingCalculatorPageForm followMatchedLink() throws NoSuchResultException {
-        String resultingUrl = "";
-        if (!searchResultLink.getText().equals(searchTerm)) {
-            throw new NoSuchResultException("Search term is missing in search results");
+        if (SearchResultText.getText().equals(searchTerm)) {
+            return new GooglePricingCalculatorPageForm(driver, searchResultLink.getAttribute("href"));
         } else {
-            return new GooglePricingCalculatorPageForm(driver, resultingUrl);
+            throw new NoSuchResultException("Search term is missing in search results");
         }
     }
 }
