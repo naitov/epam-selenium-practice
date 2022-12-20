@@ -1,6 +1,9 @@
 package hardcore.page;
 
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WindowType;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -13,41 +16,41 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class YopmailHomePage extends HardcorePage {
-
-    String emailName;
-    Double parsedSumFromGoogleCalculator;
-
-    @FindBy(xpath = "//input[@class='ycptinput']")
-    WebElement emailInputField;
-
+public class YopmailHomePage extends AbstractHardcorePage {
+    private final String estimateWindowHandle;
+    private String yopmailWindowHandle;
     @FindBy(xpath = "//button[@id='refresh']")
     WebElement refreshButton;
-
     @FindBy(xpath = "//div[@id='nbmail']")
     WebElement mailCounterLabel;
-
     @FindBy(xpath = "//*[contains(text(), 'Estimated Monthly Cost:')]")
     WebElement estimatedMonthlyCostField;
+    private String randomEmailName;
 
-    public YopmailHomePage(WebDriver driver, String emailName, Double parsedSum) {
+    public YopmailHomePage(WebDriver driver, String estimateWindowHandle) {
         super(driver);
-        this.emailName = emailName;
-        parsedSumFromGoogleCalculator = parsedSum;
+        this.estimateWindowHandle = estimateWindowHandle;
+
     }
 
     public YopmailHomePage openEmailPageInNewTab() {
         driver.switchTo().newWindow(WindowType.TAB);
         driver.navigate().to("https://yopmail.com/ru/");
+        yopmailWindowHandle = driver.getWindowHandle();
         new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS))
                 .until(ExpectedConditions.elementToBeClickable(By.xpath("//button[@id='accept']"))).click();
         return this;
     }
 
-    public YopmailHomePage createNewMailBox() {
-        emailInputField.sendKeys(emailName);
-        emailInputField.sendKeys(Keys.ENTER);
+    public YopmailHomePage createNewMailBoxWithRandomName() {
+        createNewClickableElement(10, "//a[@href='email-generator']").click();
+        randomEmailName = String.format("%s@yopmail.com", createNewPresenceElement(10, "//span[@class='genytxt']").getText());
+        createNewClickableElement(10, "//button[@onclick='egengo();']").click();
         return this;
+    }
+
+    public void switchToEstimatePage() {
+        driver.switchTo().window(estimateWindowHandle);
     }
 
     public YopmailHomePage waitForMail() throws InterruptedException {
@@ -58,18 +61,26 @@ public class YopmailHomePage extends HardcorePage {
         return this;
     }
 
-    public boolean expectThatSumInEstimateAndEmailAreEqual() throws ParseException {
+    public double getActualSum() throws ParseException {
         WebElement mailFrame = new WebDriverWait(driver, Duration.of(500, ChronoUnit.MILLIS))
                 .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//iframe[@id='ifmail']")));
         driver.switchTo().frame(mailFrame);
         String emailCost = estimatedMonthlyCostField.getText();
-        Double parsedSumFromEmail = 0d;
+        double parsedSumFromEmail = 0d;
         Pattern pattern = Pattern.compile("([0-9,.]{2,20})");
         Matcher matcher = pattern.matcher(emailCost);
         if (matcher.find()) {
             NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
             parsedSumFromEmail = numberFormat.parse(matcher.group()).doubleValue();
         }
-        return parsedSumFromEmail.equals(parsedSumFromGoogleCalculator);
+        return parsedSumFromEmail;
+    }
+
+    public String getRandomEmailName() {
+        return randomEmailName;
+    }
+
+    public String getYopmailWindowHandle() {
+        return yopmailWindowHandle;
     }
 }

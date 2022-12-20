@@ -1,18 +1,12 @@
 package hurt_me_plenty.page;
 
 import hurt_me_plenty.exceptions.NoSuchResultException;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
-
-public class GoogleCloudHomePage extends Page {
-
+public class GoogleCloudHomePage extends AbstractPage {
+    private static final String SEARCH_TERM = "Google Cloud Pricing Calculator";
 
     @FindBy(name = "q")
     private WebElement searchField;
@@ -21,21 +15,24 @@ public class GoogleCloudHomePage extends Page {
         super(driver);
     }
 
-    public GoogleCloudHomePage openPage(String url) {
+    public GoogleCloudHomePage openHomePage(String url) {
         driver.get(url);
         return this;
     }
 
-    public GooglePricingCalculatorPageForm searchForTerm(String searchTerm) throws NoSuchResultException {
-        searchField.sendKeys(searchTerm);
+    public GoogleCloudHomePage searchForTerm() {
+        searchField.sendKeys(SEARCH_TERM);
         searchField.submit();
-        WebElement searchResultLink = new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//b[text()='Google Cloud Pricing Calculator']/parent::a")));
-        WebElement SearchResultText = new WebDriverWait(driver, Duration.of(10, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//b[text()='Google Cloud Pricing Calculator']/parent::a/child::b")));
+        return this;
+    }
 
-        if (SearchResultText.getText().equals(searchTerm)) {
-            return new GooglePricingCalculatorPageForm(driver, searchResultLink.getAttribute("href"));
+    public GooglePricingCalculatorFormPage getCalculatorPageFromSearch() throws NoSuchResultException {
+        WebElement searchResultLink = createNewClickableElement(10,
+                "//b[text()='Google Cloud Pricing Calculator']/parent::a");
+        WebElement SearchResultText = createNewPresenceElement(10,
+                "//b[text()='Google Cloud Pricing Calculator']/parent::a/child::b");
+        if (SearchResultText.getText().equals(SEARCH_TERM)) {
+            return new GooglePricingCalculatorFormPage(driver, searchResultLink.getAttribute("href"));
         } else {
             throw new NoSuchResultException("Search term is missing in search results");
         }

@@ -1,20 +1,20 @@
 package bring_it_on.page;
 
-import bring_it_on.test.WebDrivePastebinCodeTest;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-public class PastebinCodeNewPaste {
+public class PastebinCodeNewPastePage {
+    private final WebDriver driver;
 
-    public WebDriver driver;
-
-    @FindBy(xpath = "//button[@class='sc-ifAKCX ljEJIv']")
+    @FindBy(xpath = "//*[@id='qc-cmp2-ui']//button[text()='AGREE']")
     private WebElement acceptCookiesBtn;
 
     @FindBy(xpath = "//div/textarea[@id='postform-text']")
@@ -29,28 +29,28 @@ public class PastebinCodeNewPaste {
     @FindBy(xpath = "//span[@id='select2-postform-expiration-container']")
     private WebElement expirationContainer;
 
-    @FindBy(xpath = "//*[@id='select2-postform-expiration-results']/li[3]")
+    @FindBy(xpath = "//li[contains(@id, '10M')]")
     private WebElement expirationElement10M;
 
     @FindBy(id = "postform-name")
     private WebElement formNameInputField;
 
-    @FindBy(xpath = "//button[text()='Create New Paste']")
+    @FindBy(xpath = "//button[@type='submit']")
     private WebElement submitButton;
 
-    public PastebinCodeNewPaste(WebDriver driver) {
+    public PastebinCodeNewPastePage(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
     }
 
-    public PastebinCodeNewPaste openPage() {
-        driver.get(WebDrivePastebinCodeTest.PAGE_URL);
-        driver.manage().timeouts().implicitlyWait(Duration.of(10, ChronoUnit.SECONDS));
+    public PastebinCodeNewPastePage openPage() {
+        driver.get("https://pastebin.com");
         acceptCookiesBtn.click();
         return this;
     }
 
-    public PastebinCodeNewPaste addPasteText(String[] pasteTextArray) {
+    public PastebinCodeNewPastePage addPasteText(String pasteText) {
+        String[] pasteTextArray = pasteText.split("\\n");
         for (String line : pasteTextArray) {
             textInputField.sendKeys(line);
             textInputField.sendKeys(Keys.ENTER);
@@ -58,21 +58,22 @@ public class PastebinCodeNewPaste {
         return this;
     }
 
-    public PastebinCodeNewPaste setSyntaxHighlightingToBash() {
+    public PastebinCodeNewPastePage setSyntaxHighlightingToBash() {
         syntaxHighlightingContainer.click();
         syntaxHighlightingElementBash.sendKeys("bash");
         syntaxHighlightingElementBash.sendKeys(Keys.ENTER);
         return this;
     }
 
-    public PastebinCodeNewPaste setExpirationPeriod10Minutes() {
-        driver.manage().timeouts().implicitlyWait(Duration.of(3, ChronoUnit.SECONDS));
+    public PastebinCodeNewPastePage setExpirationPeriod10Minutes() {
         expirationContainer.click();
-        expirationElement10M.click();
+        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
+                .until(ExpectedConditions.elementToBeClickable(expirationElement10M))
+                .click();
         return this;
     }
 
-    public PastebinCodeNewPaste addPasteName(String pasteName) {
+    public PastebinCodeNewPastePage addPasteName(String pasteName) {
         formNameInputField.sendKeys(pasteName);
         return this;
     }

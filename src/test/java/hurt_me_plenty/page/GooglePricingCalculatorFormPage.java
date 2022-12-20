@@ -1,25 +1,16 @@
-package hardcore.page;
+package hurt_me_plenty.page;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
-public class HardcorePricingCalculatorPageForm extends HardcorePage {
-
+public class GooglePricingCalculatorFormPage extends AbstractPage {
     String searchResultUrl;
-
-    @FindBy(xpath = "//button[@class='devsite-snackbar-action']")
-    private WebElement cookieOkButton;
-
     @FindBy(xpath = "//iframe[@id='myFrame']")
     WebElement iFrameElement;
-
+    @FindBy(xpath = "//button[@class='devsite-snackbar-action']")
+    private WebElement cookieOkButton;
     @FindBy(xpath = "//input[@name='quantity']")
     private WebElement numberOfInstancesInputField;
 
@@ -62,13 +53,12 @@ public class HardcorePricingCalculatorPageForm extends HardcorePage {
     @FindBy(xpath = "//button[@aria-label='Add to Estimate']")
     private WebElement addToEstimateButton;
 
-    public HardcorePricingCalculatorPageForm(WebDriver driver, String searchResultUrl) {
+    public GooglePricingCalculatorFormPage(WebDriver driver, String searchResultUrl) {
         super(driver);
         this.searchResultUrl = searchResultUrl;
     }
 
-    @Override
-    public HardcorePricingCalculatorPageForm openPage() {
+    public GooglePricingCalculatorFormPage openFormPage() {
         driver.get(searchResultUrl);
         cookieOkButton.click();
         driver.switchTo().frame(0);
@@ -76,9 +66,9 @@ public class HardcorePricingCalculatorPageForm extends HardcorePage {
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm fillAllFieldsAccordingToTerms() {
+    public GooglePricingCalculatorFormPage fillAllNecessaryFields() {
         this.setNumberOfInstances()
-                .selectOperationgSystem()
+                .selectOperationSystem()
                 .selectProvisioningModel()
                 .selectSeries()
                 .selectMachineType()
@@ -91,81 +81,79 @@ public class HardcorePricingCalculatorPageForm extends HardcorePage {
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm setNumberOfInstances() {
+    private GooglePricingCalculatorFormPage setNumberOfInstances() {
         numberOfInstancesInputField.sendKeys("4");
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectOperationgSystem() {
+    private GooglePricingCalculatorFormPage selectOperationSystem() {
         operationSystemList.click();
         operationSystemElement.click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectProvisioningModel() {
+    private GooglePricingCalculatorFormPage selectProvisioningModel() {
         provisioningModelList.click();
         provisioningModelElement.click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectSeries() {
+    private GooglePricingCalculatorFormPage selectSeries() {
         seriesList.click();
-        new WebDriverWait(driver, Duration.of(2, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'N1')]/parent::md-option"))).click();
+        createNewClickableElement(1, "//div[@class='md-text ng-binding'][contains(text(), 'N1')]/parent::md-option")
+                .click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectMachineType() {
+    private GooglePricingCalculatorFormPage selectMachineType() {
         machineTypeList.click();
-        new WebDriverWait(driver, Duration.of(3, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'n1-standard-8 (vCPUs: 8, RAM: 30GB)')]/parent::md-option"))).click();
+        createNewClickableElement(3, "//div[@class='md-text ng-binding'][contains(text(), 'n1-standard-8 (vCPUs: 8, RAM: 30GB)')]/parent::md-option")
+                .click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm activateCheckboxAddGPU() {
+    private GooglePricingCalculatorFormPage activateCheckboxAddGPU() {
         addGpuCheckbox.click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectGPUType() {
+    private GooglePricingCalculatorFormPage selectGPUType() {
         gpuTypeList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'Tesla P4')]/parent::md-option"))).click();
+        createNewClickableElement(2, "//div[@class='md-text ng-binding'][contains(text(), 'Tesla P4')]/parent::md-option")
+                .click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectNumberOfGPUs() {
+    private GooglePricingCalculatorFormPage selectNumberOfGPUs() {
         numberOfGpusList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//*[contains(text(), '1')]/parent::*[@id='select_option_477']"))).click();
+        createNewClickableElement(1, "//*[contains(text(), '1')]/parent::*[@id='select_option_477']")
+                .click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectLocalSsd() {
+    private GooglePricingCalculatorFormPage selectLocalSsd() {
         localSsdList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), '2x375 GB')]/parent::md-option"))).click();
+        createNewClickableElement(1, "//div[@class='md-text ng-binding'][contains(text(), '2x375 GB')]/parent::md-option")
+                .click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectDataCenterLocation() {
+    private GooglePricingCalculatorFormPage selectDataCenterLocation() {
         datacenterLocationList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'Frankfurt')]/parent::*[@id='select_option_228']"))).click();
+        createNewClickableElement(1, "//div[@class='md-text ng-binding'][contains(text(), 'Frankfurt')]/parent::*[@id='select_option_228']")
+                .click();
         return this;
     }
 
-    public HardcorePricingCalculatorPageForm selectCommittedUsage() {
+    private void selectCommittedUsage() {
         committedUsageList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text'][contains(text(), '1 Year')]/parent::*[@id='select_option_128']"))).click();
-        return this;
+        createNewClickableElement(1, "//div[@class='md-text'][contains(text(), '1 Year')]/parent::*[@id='select_option_128']")
+                .click();
     }
 
-    public HardcorePricingCalculatorPageResult addToEstimate() {
+    public GooglePricingCalculatorEstimatePage addToEstimate() {
         addToEstimateButton.submit();
-        return new HardcorePricingCalculatorPageResult(driver);
+        return new GooglePricingCalculatorEstimatePage(driver);
     }
-
 
 }

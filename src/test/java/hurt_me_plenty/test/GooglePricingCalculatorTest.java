@@ -2,9 +2,10 @@ package hurt_me_plenty.test;
 
 import hurt_me_plenty.exceptions.NoSuchResultException;
 import hurt_me_plenty.page.GoogleCloudHomePage;
+import hurt_me_plenty.page.GooglePricingCalculatorEstimatePage;
+import hurt_me_plenty.page.GooglePricingCalculatorFormPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -12,13 +13,17 @@ import org.testng.annotations.Test;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 
 public class GooglePricingCalculatorTest {
-    public WebDriver driver;
-    private final String HOMEPAGE_URL = "https://cloud.google.com/";
-    private final String SEARCH_TERM = "Google Cloud Pricing Calculator";
+    private static final String HOMEPAGE_URL = "https://cloud.google.com/";
+
+    private WebDriver driver;
 
     @BeforeMethod(alwaysRun = true)
     public void browserSetup() {
@@ -33,54 +38,35 @@ public class GooglePricingCalculatorTest {
         driver = null;
     }
 
-    @Test(description = "Assert that manual and expecting sums are equal")
-    public void TestResultingSumEqualsExpectingSum() throws NoSuchResultException, ParseException {
-        Double manualSum = 2275.48;
-        Assert.assertTrue(new GoogleCloudHomePage(driver)
-                .openPage(HOMEPAGE_URL)
-                .searchForTerm(SEARCH_TERM)
-                .openPage()
-                .fillAllFieldsAccordingToTerms()
-                .addToEstimate()
-                .expectThatSumInEstimateBlockEqualsTo(manualSum)
-        );
+    @Test(description = "Actual and expected sums should be equal")
+    public void ActualAndExpectedSumsShouldBeEqual() throws NoSuchResultException, ParseException {
+        Double expectedSum = 2275.48;
+        GooglePricingCalculatorFormPage homePage = new GoogleCloudHomePage(driver)
+                .openHomePage(HOMEPAGE_URL)
+                .searchForTerm()
+                .getCalculatorPageFromSearch();
+        GooglePricingCalculatorFormPage calculatorFormPage = homePage.openFormPage();
+        GooglePricingCalculatorEstimatePage estimatePage = calculatorFormPage.fillAllNecessaryFields().addToEstimate();
+        double actualSum = estimatePage.getActualSumFromField();
+        assertThat("Actual and expected sums should be equal", actualSum, equalTo(expectedSum));
     }
 
-    @Test(description = "Assert that new and resulting fields are equal")
-    public void TestResultingFieldsEqualExpectingFields() throws NoSuchResultException {
-        Map<String, Integer> fields = new HashMap<>() {{
-            put("Provisioning model: Regular", 1);
-            put("Region: Frankfurt", 1);
-            put("Commitment term: 1 Year", 1);
-        }};
-
-        Assert.assertTrue(new GoogleCloudHomePage(driver)
-                .openPage(HOMEPAGE_URL)
-                .searchForTerm(SEARCH_TERM)
-                .openPage()
-                .fillAllFieldsAccordingToTerms()
-                .addToEstimate()
-                .expectThatResultingFieldsEqualTo(fields)
-        );
-    }
-
-    @Test(enabled = false)
-    public void TestResultingFieldsEqualExpectingFieldsPlusTwoLines() throws NoSuchResultException {
-        Map<String, Integer> fields = new HashMap<>() {{
-            put("Provisioning model: Regular", 1);
-            put("Instance type: n1-standard-8", 1);
-            put("Local SSD: 2x375 GiB", 1);
-            put("Region: Frankfurt", 1);
-            put("Commitment term: 1 Year", 1);
-        }};
-
-        Assert.assertTrue(new GoogleCloudHomePage(driver)
-                .openPage(HOMEPAGE_URL)
-                .searchForTerm(SEARCH_TERM)
-                .openPage()
-                .fillAllFieldsAccordingToTerms()
-                .addToEstimate()
-                .expectThatResultingFieldsEqualTo(fields)
-        );
+    @Test(description = "Resulting fields should contain expected parameters")
+    public void ResultingFieldsShouldContainExpectedParameters() throws NoSuchResultException {
+        List<String> expectedParameters = Arrays.asList(
+                "Provisioning model: Regular",
+                "Instance type: n1-standard-8",
+                "Local SSD: 2x375 GiB",
+                "Region: Frankfurt",
+                "Commitment term: 1 Year");
+        GooglePricingCalculatorFormPage homePage = new GoogleCloudHomePage(driver)
+                .openHomePage(HOMEPAGE_URL)
+                .searchForTerm()
+                .getCalculatorPageFromSearch();
+        GooglePricingCalculatorFormPage calculatorFormPage = homePage.openFormPage();
+        GooglePricingCalculatorEstimatePage estimatePage = calculatorFormPage.fillAllNecessaryFields().addToEstimate();
+        List<String> actualParameters = estimatePage.getActualTextFromField();
+        assertThat("Resulting fields should contain expected parameters", actualParameters,
+                hasItems(expectedParameters.toArray(new String[0])));
     }
 }
