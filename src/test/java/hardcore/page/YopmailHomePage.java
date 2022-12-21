@@ -17,15 +17,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class YopmailHomePage extends AbstractHardcorePage {
+    private String randomEmailName;
     private final String estimateWindowHandle;
     private String yopmailWindowHandle;
+
     @FindBy(xpath = "//button[@id='refresh']")
     WebElement refreshButton;
+
     @FindBy(xpath = "//div[@id='nbmail']")
     WebElement mailCounterLabel;
+
     @FindBy(xpath = "//*[contains(text(), 'Estimated Monthly Cost:')]")
     WebElement estimatedMonthlyCostField;
-    private String randomEmailName;
+
 
     public YopmailHomePage(WebDriver driver, String estimateWindowHandle) {
         super(driver);
@@ -43,9 +47,9 @@ public class YopmailHomePage extends AbstractHardcorePage {
     }
 
     public YopmailHomePage createNewMailBoxWithRandomName() {
-        createNewClickableElement(10, "//a[@href='email-generator']").click();
-        randomEmailName = String.format("%s@yopmail.com", createNewPresenceElement(10, "//span[@class='genytxt']").getText());
-        createNewClickableElement(10, "//button[@onclick='egengo();']").click();
+        createWaitWithClickableCondition(WaitTimeouts.TEN_SEC, "//a[@href='email-generator']").click();
+        randomEmailName = String.format("%s@yopmail.com", createWaitWithPresenceCondition(WaitTimeouts.TEN_SEC, "//span[@class='genytxt']").getText());
+        createWaitWithClickableCondition(WaitTimeouts.TEN_SEC, "//button[@onclick='egengo();']").click();
         return this;
     }
 
