@@ -1,23 +1,16 @@
 package hardcore.page;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 public class HardcorePricingCalculatorFormPage extends AbstractHardcorePage {
-    String searchResultUrl;
+    private final String searchResultUrl;
+    @FindBy(xpath = "//iframe[@id='myFrame']")
+    WebElement iFrameElement;
 
     @FindBy(xpath = "//button[@class='devsite-snackbar-action']")
     private WebElement cookieOkButton;
-
-    @FindBy(xpath = "//iframe[@id='myFrame']")
-    WebElement iFrameElement;
 
     @FindBy(xpath = "//input[@name='quantity']")
     private WebElement numberOfInstancesInputField;
@@ -108,15 +101,14 @@ public class HardcorePricingCalculatorFormPage extends AbstractHardcorePage {
 
     public HardcorePricingCalculatorFormPage selectSeries() {
         seriesList.click();
-        new WebDriverWait(driver, Duration.of(2, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'N1')]/parent::md-option"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.THREE_SEC, "//div[@class='md-text ng-binding'][contains(text(), 'N1')]/parent::md-option").click();
         return this;
     }
 
     public HardcorePricingCalculatorFormPage selectMachineType() {
         machineTypeList.click();
-        new WebDriverWait(driver, Duration.of(3, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'n1-standard-8 (vCPUs: 8, RAM: 30GB)')]/parent::md-option"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.THREE_SEC, "//div[@class='md-text ng-binding'][contains(text(), 'n1-standard-8 (vCPUs: 8, RAM: 30GB)')]/parent::md-option")
+                .click();
         return this;
     }
 
@@ -127,36 +119,36 @@ public class HardcorePricingCalculatorFormPage extends AbstractHardcorePage {
 
     public HardcorePricingCalculatorFormPage selectGPUType() {
         gpuTypeList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'Tesla P4')]/parent::md-option"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.ONE_SEC, "//div[@class='md-text ng-binding'][contains(text(), 'Tesla P4')]/parent::md-option")
+                .click();
         return this;
     }
 
     public HardcorePricingCalculatorFormPage selectNumberOfGPUs() {
         numberOfGpusList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//*[contains(text(), '1')]/parent::*[@id='select_option_477']"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.ONE_SEC, "//*[contains(text(), '1')]/parent::*[@id='select_option_477']")
+                .click();
         return this;
     }
 
     public HardcorePricingCalculatorFormPage selectLocalSsd() {
         localSsdList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), '2x375 GB')]/parent::md-option"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.ONE_SEC, "//div[@class='md-text ng-binding'][contains(text(), '2x375 GB')]/parent::md-option")
+                .click();
         return this;
     }
 
     public HardcorePricingCalculatorFormPage selectDataCenterLocation() {
         datacenterLocationList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text ng-binding'][contains(text(), 'Frankfurt')]/parent::*[@id='select_option_228']"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.ONE_SEC, "//div[@class='md-text ng-binding'][contains(text(), 'Frankfurt')]/parent::*[@id='select_option_228']")
+                .click();
         return this;
     }
 
     public void selectCommittedUsage() {
         committedUsageList.click();
-        new WebDriverWait(driver, Duration.of(1, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='md-text'][contains(text(), '1 Year')]/parent::*[@id='select_option_128']"))).click();
+        createWaitWithClickableCondition(WaitTimeouts.ONE_SEC, "//div[@class='md-text'][contains(text(), '1 Year')]/parent::*[@id='select_option_128']")
+                .click();
     }
 
     public HardcorePricingCalculatorEstimatePage addToEstimate() {

@@ -1,6 +1,5 @@
 package hardcore.test;
 
-import hardcore.exceptions.HardcoreNoSuchResultException;
 import hardcore.page.HardcoreGoogleHomePage;
 import hardcore.page.HardcorePricingCalculatorEstimatePage;
 import hardcore.page.HardcorePricingCalculatorFormPage;
@@ -20,6 +19,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 
 public class HardcorePricingCalculatorTest {
     public static final String HOMEPAGE_URL = "https://cloud.google.com/";
+    public static final String SEARCH_TERM = "Google Cloud Pricing Calculator";
     private WebDriver driver;
 
     @BeforeMethod(alwaysRun = true)
@@ -30,7 +30,7 @@ public class HardcorePricingCalculatorTest {
     }
 
     @Test(description = "Actual and expected sums should be equal")
-    public void ActualAndExpectedSumShouldBeEqual() throws HardcoreNoSuchResultException, ParseException, InterruptedException {
+    public void ActualAndExpectedSumShouldBeEqual() throws ParseException, InterruptedException {
         HardcorePricingCalculatorFormPage homePage = new HardcoreGoogleHomePage(driver)
                 .openHomePage(HOMEPAGE_URL)
                 .searchForTerm()

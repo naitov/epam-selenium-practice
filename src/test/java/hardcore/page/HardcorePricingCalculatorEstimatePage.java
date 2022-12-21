@@ -15,7 +15,7 @@ public class HardcorePricingCalculatorEstimatePage extends AbstractHardcorePage 
     private YopmailHomePage yopmailPage;
 
     @FindBy(xpath = "//iframe[@id='myFrame']")
-    WebElement iFrameElement;
+    private WebElement iFrameElement;
 
     public HardcorePricingCalculatorEstimatePage(WebDriver driver) {
         super(driver);
@@ -24,7 +24,7 @@ public class HardcorePricingCalculatorEstimatePage extends AbstractHardcorePage 
     public double getEstimateSum() throws ParseException {
         driver.switchTo().frame(0);
         driver.switchTo().frame(iFrameElement);
-        String estimateSummaryString = createNewPresenceElement(3, "//*[@id='compute']/descendant::b[contains(text(), 'Estimated Component Cost')]")
+        String estimateSummaryString = createWaitWithPresenceCondition(WaitTimeouts.THREE_SEC, "//*[@id='compute']/descendant::b[contains(text(), 'Estimated Component Cost')]")
                 .getText();
         Pattern pattern = Pattern.compile("([0-9,.]{2,20})");
         Matcher matcher = pattern.matcher(estimateSummaryString);
@@ -43,11 +43,9 @@ public class HardcorePricingCalculatorEstimatePage extends AbstractHardcorePage 
 
     public HardcorePricingCalculatorEstimatePage sendEmailFromPage() {
         String emailName = yopmailPage.getRandomEmailName();
-//        driver.switchTo().frame(0);
-//        driver.switchTo().frame(iFrameElement);
-        createNewClickableElement(10, "//span[text()='email']/parent::button").click();
-        createNewPresenceElement(10, "//input[@type='email']").sendKeys(emailName);
-        createNewPresenceElement(10, "//button[@aria-label='Send Email']").click();
+        createWaitWithClickableCondition(WaitTimeouts.TEN_SEC, "//span[text()='email']/parent::button").click();
+        createWaitWithPresenceCondition(WaitTimeouts.TEN_SEC, "//input[@type='email']").sendKeys(emailName);
+        createWaitWithPresenceCondition(WaitTimeouts.TEN_SEC, "//button[@aria-label='Send Email']").click();
         return this;
     }
 

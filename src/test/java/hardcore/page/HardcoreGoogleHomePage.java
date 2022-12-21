@@ -1,12 +1,15 @@
 package hardcore.page;
 
-import hardcore.exceptions.HardcoreNoSuchResultException;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.List;
+
+import static hardcore.test.HardcorePricingCalculatorTest.SEARCH_TERM;
+
 public class HardcoreGoogleHomePage extends AbstractHardcorePage {
-    private static final String SEARCH_TERM = "Google Cloud Pricing Calculator";
 
     @FindBy(name = "q")
     private WebElement searchField;
@@ -26,14 +29,14 @@ public class HardcoreGoogleHomePage extends AbstractHardcorePage {
         return this;
     }
 
-    public HardcorePricingCalculatorFormPage getCalculatorPageFromSearch() throws HardcoreNoSuchResultException {
-        WebElement searchResultLink = createNewClickableElement(10, "//b[text()='Google Cloud Pricing Calculator']/parent::a");
-        WebElement SearchResultText = createNewPresenceElement(10, "//b[text()='Google Cloud Pricing Calculator']/parent::a/child::b");
-
-        if (SearchResultText.getText().equals(SEARCH_TERM)) {
-            return new HardcorePricingCalculatorFormPage(driver, searchResultLink.getAttribute("href"));
-        } else {
-            throw new HardcoreNoSuchResultException("Search term is missing in search results");
+    public HardcorePricingCalculatorFormPage getCalculatorPageFromSearch() {
+        List<WebElement> searchResultsList = driver.findElements(By.xpath("//div[@class='gsc-webResult gsc-result']//a"))
+                .stream().toList();
+        for (WebElement element : searchResultsList) {
+            if (element.getText().equals(SEARCH_TERM)) {
+                return new HardcorePricingCalculatorFormPage(driver, element.getAttribute("href"));
+            }
         }
+        return null;
     }
 }
