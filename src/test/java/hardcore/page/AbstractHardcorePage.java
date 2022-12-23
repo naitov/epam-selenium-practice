@@ -33,13 +33,13 @@ public abstract class AbstractHardcorePage {
         }
     }
 
+    public WebElement createWaitWithPresenceCondition(WaitTimeouts timeout, String xpath) {
+        return new WebDriverWait(driver, getDuration(timeout)).until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+    }
+
     public AbstractHardcorePage(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
-    }
-
-    public WebElement createWaitWithPresenceCondition(WaitTimeouts timeout, String xpath) {
-        return new WebDriverWait(driver, getDuration(timeout)).until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
     }
 
     public WebElement createWaitWithClickableCondition(WaitTimeouts timeout, String xpath) {

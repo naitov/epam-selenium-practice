@@ -23,15 +23,20 @@ public class GooglePricingCalculatorEstimatePage extends AbstractPage {
                 .stream().map(WebElement::getText).toList();
         List<String> webElementTextList = new ArrayList<>();
         for (String row : tempElements) {
-            String[] temp = row.split("\\n");
-            webElementTextList.addAll(List.of(temp));
+            Matcher matcher = Pattern.compile("\\n").matcher(row);
+            if (matcher.find()) {
+                webElementTextList.add(row.substring(0, matcher.start()));
+                webElementTextList.add(row.substring(matcher.end()));
+            } else {
+                webElementTextList.add(row);
+            }
         }
         return webElementTextList;
     }
 
     public double getActualSumFromField() throws ParseException {
         double parsedSum = 0d;
-        String elementText = getElementWithPresenceWait(WaitTimeouts.THREE_SEC, "//*[@id='compute']/descendant::b[contains(text(), 'Estimated Component Cost')]")
+        String elementText = createNewPresenceElement(3, "//*[@id='compute']/descendant::b[contains(text(), 'Estimated Component Cost')]")
                 .getText();
         Matcher matcher = Pattern.compile("([0-9,.]{2,20})").matcher(elementText);
         if (matcher.find()) {
