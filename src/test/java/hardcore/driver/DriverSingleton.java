@@ -15,18 +15,19 @@ public class DriverSingleton {
     public static WebDriver getDriver() {
         if (driver == null) {
             switch (System.getProperty("browser")) {
-                case "chrome": {
+                case "chrome" -> {
                     WebDriverManager.chromedriver().setup();
                     driver = new ChromeDriver();
                 }
-                case "firefox": {
+                case "firefox" -> {
                     WebDriverManager.firefoxdriver().setup();
                     driver = new FirefoxDriver();
                 }
-                case "safari": {
+                case "safari" -> {
                     WebDriverManager.safaridriver().setup();
                     driver = new SafariDriver();
                 }
+                default -> throw new IllegalArgumentException("Illegal browser");
             }
             driver.manage().window().maximize();
         }

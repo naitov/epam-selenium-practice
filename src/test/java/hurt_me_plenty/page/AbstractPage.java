@@ -11,20 +11,45 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 abstract class AbstractPage {
-    protected final WebDriver driver;
+    protected WebDriver driver;
 
     public AbstractPage(WebDriver driver) {
         this.driver = driver;
         PageFactory.initElements(driver, this);
     }
 
-    WebElement createNewPresenceElement(int durationSec, String xpath) {
-        return new WebDriverWait(driver, Duration.of(durationSec, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+    private Duration getDuration(AbstractPage.WaitTimeouts timeout) {
+        switch (timeout) {
+            case ONE_SEC -> {
+                return Duration.of(1, ChronoUnit.SECONDS);
+            }
+            case THREE_SEC -> {
+                return Duration.of(3, ChronoUnit.SECONDS);
+            }
+            case FIVE_SEC -> {
+                return Duration.of(5, ChronoUnit.SECONDS);
+            }
+            case TEN_SEC -> {
+                return Duration.of(10, ChronoUnit.SECONDS);
+            }
+            default -> {
+                return Duration.of(0, ChronoUnit.SECONDS);
+            }
+        }
     }
 
-    WebElement createNewClickableElement(int durationSec, String xpath) {
-        return new WebDriverWait(driver, Duration.of(durationSec, ChronoUnit.SECONDS))
-                .until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+    public WebElement getElementWithPresenceWait(AbstractPage.WaitTimeouts timeout, String xpath) {
+        return new WebDriverWait(driver, getDuration(timeout)).until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+    }
+
+    public WebElement getElementWithClickableWait(AbstractPage.WaitTimeouts timeout, String xpath) {
+        return new WebDriverWait(driver, getDuration(timeout)).until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+    }
+
+    enum WaitTimeouts {
+        ONE_SEC,
+        THREE_SEC,
+        FIVE_SEC,
+        TEN_SEC
     }
 }
