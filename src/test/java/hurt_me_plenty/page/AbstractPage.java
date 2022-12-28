@@ -1,5 +1,6 @@
 package hurt_me_plenty.page;
 
+import lombok.AllArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -18,38 +19,20 @@ abstract class AbstractPage {
         PageFactory.initElements(driver, this);
     }
 
-    private Duration getDuration(AbstractPage.WaitTimeouts timeout) {
-        switch (timeout) {
-            case ONE_SEC -> {
-                return Duration.of(1, ChronoUnit.SECONDS);
-            }
-            case THREE_SEC -> {
-                return Duration.of(3, ChronoUnit.SECONDS);
-            }
-            case FIVE_SEC -> {
-                return Duration.of(5, ChronoUnit.SECONDS);
-            }
-            case TEN_SEC -> {
-                return Duration.of(10, ChronoUnit.SECONDS);
-            }
-            default -> {
-                return Duration.of(0, ChronoUnit.SECONDS);
-            }
-        }
-    }
-
     public WebElement getElementWithPresenceWait(AbstractPage.WaitTimeouts timeout, String xpath) {
-        return new WebDriverWait(driver, getDuration(timeout)).until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
+        return new WebDriverWait(driver, timeout.duration).until(ExpectedConditions.presenceOfElementLocated(By.xpath(xpath)));
     }
 
     public WebElement getElementWithClickableWait(AbstractPage.WaitTimeouts timeout, String xpath) {
-        return new WebDriverWait(driver, getDuration(timeout)).until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        return new WebDriverWait(driver, timeout.duration).until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
     }
 
+    @AllArgsConstructor
     enum WaitTimeouts {
-        ONE_SEC,
-        THREE_SEC,
-        FIVE_SEC,
-        TEN_SEC
+        ONE_SEC(Duration.of(1, ChronoUnit.SECONDS)),
+        THREE_SEC(Duration.of(3, ChronoUnit.SECONDS)),
+        TEN_SEC(Duration.of(10, ChronoUnit.SECONDS));
+        private final Duration duration;
     }
 }
+

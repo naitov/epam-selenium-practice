@@ -1,16 +1,11 @@
 package hurt_me_plenty.page;
 
 import hurt_me_plenty.form.GoogleCalculatorForm;
-import hurt_me_plenty.service.GoogleFormCreator;
-import hurt_me_plenty.test.GooglePricingCalculatorTest.FormPresets;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 public class GooglePricingCalculatorFormPage extends AbstractPage {
-    private GoogleCalculatorForm form;
-    private FormPresets currentPreset;
 
     @FindBy(xpath = "//iframe[@id='myFrame']")
     private WebElement iFrameElement;
@@ -58,86 +53,73 @@ public class GooglePricingCalculatorFormPage extends AbstractPage {
         super(driver);
     }
 
-    public GooglePricingCalculatorFormPage setupFormPage() {
+    public void setupFormPage() {
         cookieOkButton.click();
         driver.switchTo().frame(0);
         driver.switchTo().frame(iFrameElement);
-        return this;
     }
 
-    public GooglePricingCalculatorFormPage initializeCalculatorForm(FormPresets preset) {
-        currentPreset = preset;
-        switch (preset) {
-            case PRESET_LIGHT -> form = GoogleFormCreator.withOnlyNumberOfInstances();
-            case PRESET_FULL -> form = GoogleFormCreator.withAllElements();
-            case PRESET_WITHOUT_GPU -> form = GoogleFormCreator.withAllelementsExcludeGpu();
-        }
-        return this;
-    }
-
-    public GooglePricingCalculatorFormPage fillAllNecessaryFields() {
-        switch (currentPreset) {
-            case PRESET_LIGHT -> {
-                this.setNumberOfInstances();
-                return this;
-            }
-            case PRESET_FULL -> {
-                this.setNumberOfInstances()
-                        .selectOperatingSystem()
-                        .selectProvisioningModel()
-                        .selectSeries()
-                        .selectMachineType()
-                        .activateCheckboxAddGPU()
-                        .selectGPUType()
-                        .selectNumberOfGPUs()
-                        .selectLocalSsd()
-                        .selectDataCenterLocation()
-                        .selectCommittedUsage();
-                return this;
-            }
-            case PRESET_WITHOUT_GPU -> {
-                this.setNumberOfInstances()
-                        .selectOperatingSystem()
-                        .selectProvisioningModel()
-                        .selectSeries()
-                        .selectMachineType()
-                        .selectLocalSsd()
-                        .selectDataCenterLocation()
-                        .selectCommittedUsage();
-                return this;
-            }
-            default -> {
-                return this;
-            }
+    public void fillAllNecessaryFields(String environment, GoogleCalculatorForm form) {
+        switch (environment) {
+            case "dev" -> this.setNumberOfInstances(form)
+                    .selectSeries(form)
+                    .selectMachineType(form);
+            case "staging" -> this.setNumberOfInstances(form)
+                    .selectOperatingSystem(form)
+                    .selectProvisioningModel(form)
+                    .selectSeries(form)
+                    .selectMachineType(form)
+                    .activateCheckboxAddGPU()
+                    .selectGpuType(form)
+                    .selectNumberOfGpus(form)
+                    .selectLocalSsd(form)
+                    .selectDataCenterLocation(form)
+                    .selectCommittedUsage(form);
+            case "qa" -> this.setNumberOfInstances(form)
+                    .selectOperatingSystem(form)
+                    .selectProvisioningModel(form)
+                    .selectSeries(form)
+                    .selectMachineType(form)
+                    .selectLocalSsd(form)
+                    .selectDataCenterLocation(form)
+                    .selectCommittedUsage(form);
         }
     }
 
-    private GooglePricingCalculatorFormPage setNumberOfInstances() {
-        numberOfInstancesInputField.sendKeys(String.valueOf(form.getNumberOfInstances()));
+    private GooglePricingCalculatorFormPage setNumberOfInstances(GoogleCalculatorForm form) {
+        numberOfInstancesInputField.sendKeys(form.getNumberOfInstances().getValue());
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectOperatingSystem() {
+    private GooglePricingCalculatorFormPage selectOperatingSystem(GoogleCalculatorForm form) {
         operationSystemList.click();
-        driver.findElement(By.xpath(form.getOperatingSystemXpath())).click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC,
+                String.format("//md-option[@value='%s']", form.getOperatingSystem().getValue()))
+                .click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectProvisioningModel() {
+    private GooglePricingCalculatorFormPage selectProvisioningModel(GoogleCalculatorForm form) {
         provisioningModelList.click();
-        driver.findElement(By.xpath(form.getProvisioningModelXpath())).click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC,
+                String.format("//md-option[@value='%s']", form.getProvisioningModel().getValue()))
+                .click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectSeries() {
+    private GooglePricingCalculatorFormPage selectSeries(GoogleCalculatorForm form) {
         seriesList.click();
-        getElementWithClickableWait(WaitTimeouts.ONE_SEC, form.getSeriesXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC,
+                String.format("//md-option[@value='%s']", form.getSeries().getValue()))
+                .click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectMachineType() {
+    private GooglePricingCalculatorFormPage selectMachineType(GoogleCalculatorForm form) {
         machineTypeList.click();
-        getElementWithClickableWait(WaitTimeouts.THREE_SEC, form.getMachineTypeXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s']", form.getMachineType().getValue()))
+                .click();
         return this;
     }
 
@@ -146,33 +128,40 @@ public class GooglePricingCalculatorFormPage extends AbstractPage {
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectGPUType() {
+    private GooglePricingCalculatorFormPage selectGpuType(GoogleCalculatorForm form) {
         gpuTypeList.click();
-        getElementWithClickableWait(WaitTimeouts.THREE_SEC, form.getGpuTypeXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s]", form.getGpuType().getValue())).click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectNumberOfGPUs() {
+    private GooglePricingCalculatorFormPage selectNumberOfGpus(GoogleCalculatorForm form) {
         numberOfGpusList.click();
-        getElementWithClickableWait(WaitTimeouts.ONE_SEC, form.getNumberOfGpuXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s'][contains(@ng-repeat, 'listingCtrl.computeServer.gpuType')]",
+                        form.getNumberOfGpu().getValue())).click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectLocalSsd() {
+    private GooglePricingCalculatorFormPage selectLocalSsd(GoogleCalculatorForm form) {
         localSsdList.click();
-        getElementWithClickableWait(WaitTimeouts.ONE_SEC, form.getLocalSsdXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s'][@ng-repeat='item in listingCtrl.dynamicSsd.computeServer']",
+                        form.getLocalSsd().getValue())).click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectDataCenterLocation() {
+    private GooglePricingCalculatorFormPage selectDataCenterLocation(GoogleCalculatorForm form) {
         datacenterLocationList.click();
-        getElementWithClickableWait(WaitTimeouts.ONE_SEC, form.getDatacenterLocationXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC, String.format("//*[@id='%s']",
+                form.getDatacenterLocation().getValue())).click();
         return this;
     }
 
-    private void selectCommittedUsage() {
+    private void selectCommittedUsage(GoogleCalculatorForm form) {
         committedUsageList.click();
-        getElementWithClickableWait(WaitTimeouts.ONE_SEC, form.getCommittedUsageXpath()).click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC, String.format("//*[@id='%s']",
+                form.getCommittedUsage().getValue())).click();
     }
 
     public GooglePricingCalculatorEstimatePage addToEstimate() {

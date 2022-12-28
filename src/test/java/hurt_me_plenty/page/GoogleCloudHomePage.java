@@ -1,9 +1,10 @@
 package hurt_me_plenty.page;
 
-import hurt_me_plenty.test.GooglePricingCalculatorTest;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+
+import static hurt_me_plenty.test.TestSettings.SEARCH_TERM;
 
 public class GoogleCloudHomePage extends AbstractPage {
 
@@ -20,13 +21,13 @@ public class GoogleCloudHomePage extends AbstractPage {
     }
 
     public GoogleCloudHomePage searchForTerm() {
-        searchField.sendKeys(GooglePricingCalculatorTest.SEARCH_TERM);
+        searchField.sendKeys(SEARCH_TERM);
         searchField.submit();
         return this;
     }
 
     public GooglePricingCalculatorFormPage getCalculatorPageFromSearch() {
-        getElementWithClickableWait(WaitTimeouts.FIVE_SEC, "//div[@class='gs-title']//a").click();
+        getElementWithClickableWait(WaitTimeouts.TEN_SEC, "//div[@class='gs-title']//a").click();
         return new GooglePricingCalculatorFormPage(driver);
     }
 }
