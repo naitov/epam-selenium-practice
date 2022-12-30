@@ -1,12 +1,12 @@
 package hurt_me_plenty.page;
 
-import hurt_me_plenty.exceptions.NoSuchResultException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import static hurt_me_plenty.test.TestSettings.SEARCH_TERM;
+
 public class GoogleCloudHomePage extends AbstractPage {
-    private static final String SEARCH_TERM = "Google Cloud Pricing Calculator";
 
     @FindBy(name = "q")
     private WebElement searchField;
@@ -26,15 +26,8 @@ public class GoogleCloudHomePage extends AbstractPage {
         return this;
     }
 
-    public GooglePricingCalculatorFormPage getCalculatorPageFromSearch() throws NoSuchResultException {
-        WebElement searchResultLink = createNewClickableElement(10,
-                "//b[text()='Google Cloud Pricing Calculator']/parent::a");
-        WebElement SearchResultText = createNewPresenceElement(10,
-                "//b[text()='Google Cloud Pricing Calculator']/parent::a/child::b");
-        if (SearchResultText.getText().equals(SEARCH_TERM)) {
-            return new GooglePricingCalculatorFormPage(driver, searchResultLink.getAttribute("href"));
-        } else {
-            throw new NoSuchResultException("Search term is missing in search results");
-        }
+    public GooglePricingCalculatorFormPage getCalculatorPageFromSearch() {
+        getElementWithClickableWait(WaitTimeouts.TEN_SEC, "//div[@class='gs-title']//a").click();
+        return new GooglePricingCalculatorFormPage(driver);
     }
 }

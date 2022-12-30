@@ -57,6 +57,9 @@ When performing the task, you should use Selenium WebDriver, testing framework a
 8. Check data correspondence in following fields: VM Class, Instance type, Region, local SSD, commitment term
 9. Check that monthly rental amount matching the amount received when passing test manually. 
 
+### Build only with command prompt: 
+``mvn -Dbrowser=chrome -Denvironment=staging clean test``
+
 
 ## Hardcore:
 

@@ -1,113 +1,124 @@
 package hurt_me_plenty.page;
 
+import hurt_me_plenty.form.GoogleCalculatorForm;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-
 public class GooglePricingCalculatorFormPage extends AbstractPage {
-    String searchResultUrl;
+
     @FindBy(xpath = "//iframe[@id='myFrame']")
-    WebElement iFrameElement;
+    private WebElement iFrameElement;
+
     @FindBy(xpath = "//button[@class='devsite-snackbar-action']")
     private WebElement cookieOkButton;
+
     @FindBy(xpath = "//input[@name='quantity']")
     private WebElement numberOfInstancesInputField;
 
-    @FindBy(xpath = "//*[text()='Operating System / Software']/parent::*")
+    @FindBy(xpath = "//label[@for='select_103']/..")
     private WebElement operationSystemList;
 
-    @FindBy(xpath = "//div[@class='md-text' and contains(text(), 'Free')]/parent::md-option")
-    private WebElement operationSystemElement;
-
-    @FindBy(xpath = "//*[text()='Provisioning model']/parent::*")
+    @FindBy(xpath = "//label[@for='select_107']/..")
     private WebElement provisioningModelList;
 
-    @FindBy(xpath = "//div[@class='md-text'][contains(text(), 'Regular')]/parent::md-option")
-    private WebElement provisioningModelElement;
-
-    @FindBy(xpath = "//*[text()='Series']/parent::*")
+    @FindBy(xpath = "//label[@for='select_115']/..")
     private WebElement seriesList;
 
-    @FindBy(xpath = "//*[text()='Machine type']/parent::*")
+    @FindBy(xpath = "//label[@for='select_117']/..")
     private WebElement machineTypeList;
 
-    @FindBy(xpath = "//form[@name='ComputeEngineForm']/descendant::md-input-container/md-checkbox[@aria-label='Add GPUs']")
+    @FindBy(xpath = "//md-checkbox[@ng-model='listingCtrl.computeServer.addGPUs']")
     private WebElement addGpuCheckbox;
 
-    @FindBy(xpath = "//*[text()='GPU type']/parent::*")
+    @FindBy(xpath = "//label[@for='select_466']/..")
     private WebElement gpuTypeList;
 
-    @FindBy(xpath = "//*[text()='Number of GPUs']/parent::*")
+    @FindBy(xpath = "//label[@for='select_468']/..")
     private WebElement numberOfGpusList;
 
-    @FindBy(xpath = "//*[text()='Local SSD']/parent::*")
+    @FindBy(xpath = "//label[@for='select_423']/..")
     private WebElement localSsdList;
 
-    @FindBy(xpath = "//*[text()='Datacenter location']/parent::*")
+    @FindBy(xpath = "//label[@for='select_123']/..")
     private WebElement datacenterLocationList;
 
-    @FindBy(xpath = "//*[text()='Committed usage']/parent::*")
+    @FindBy(xpath = "//label[@for='select_130']/..")
     private WebElement committedUsageList;
 
     @FindBy(xpath = "//button[@aria-label='Add to Estimate']")
     private WebElement addToEstimateButton;
 
-    public GooglePricingCalculatorFormPage(WebDriver driver, String searchResultUrl) {
+    public GooglePricingCalculatorFormPage(WebDriver driver) {
         super(driver);
-        this.searchResultUrl = searchResultUrl;
     }
 
-    public GooglePricingCalculatorFormPage openFormPage() {
-        driver.get(searchResultUrl);
+    public void setupFormPage() {
         cookieOkButton.click();
         driver.switchTo().frame(0);
         driver.switchTo().frame(iFrameElement);
+    }
+
+    public void fillAllNecessaryFields(String environment, GoogleCalculatorForm form) {
+        switch (environment) {
+            case "dev" -> this.setNumberOfInstances(form)
+                    .selectSeries(form)
+                    .selectMachineType(form);
+            case "staging" -> this.setNumberOfInstances(form)
+                    .selectOperatingSystem(form)
+                    .selectProvisioningModel(form)
+                    .selectSeries(form)
+                    .selectMachineType(form)
+                    .activateCheckboxAddGPU()
+                    .selectGpuType(form)
+                    .selectNumberOfGpus(form)
+                    .selectLocalSsd(form)
+                    .selectDataCenterLocation(form)
+                    .selectCommittedUsage(form);
+            case "qa" -> this.setNumberOfInstances(form)
+                    .selectOperatingSystem(form)
+                    .selectProvisioningModel(form)
+                    .selectSeries(form)
+                    .selectMachineType(form)
+                    .selectLocalSsd(form)
+                    .selectDataCenterLocation(form)
+                    .selectCommittedUsage(form);
+        }
+    }
+
+    private GooglePricingCalculatorFormPage setNumberOfInstances(GoogleCalculatorForm form) {
+        numberOfInstancesInputField.sendKeys(form.getNumberOfInstances().getValue());
         return this;
     }
 
-    public GooglePricingCalculatorFormPage fillAllNecessaryFields() {
-        this.setNumberOfInstances()
-                .selectOperationSystem()
-                .selectProvisioningModel()
-                .selectSeries()
-                .selectMachineType()
-                .activateCheckboxAddGPU()
-                .selectGPUType()
-                .selectNumberOfGPUs()
-                .selectLocalSsd()
-                .selectDataCenterLocation()
-                .selectCommittedUsage();
-        return this;
-    }
-
-    private GooglePricingCalculatorFormPage setNumberOfInstances() {
-        numberOfInstancesInputField.sendKeys("4");
-        return this;
-    }
-
-    private GooglePricingCalculatorFormPage selectOperationSystem() {
+    private GooglePricingCalculatorFormPage selectOperatingSystem(GoogleCalculatorForm form) {
         operationSystemList.click();
-        operationSystemElement.click();
-        return this;
-    }
-
-    private GooglePricingCalculatorFormPage selectProvisioningModel() {
-        provisioningModelList.click();
-        provisioningModelElement.click();
-        return this;
-    }
-
-    private GooglePricingCalculatorFormPage selectSeries() {
-        seriesList.click();
-        createNewClickableElement(1, "//div[@class='md-text ng-binding'][contains(text(), 'N1')]/parent::md-option")
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC,
+                String.format("//md-option[@value='%s']", form.getOperatingSystem().getValue()))
                 .click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectMachineType() {
+    private GooglePricingCalculatorFormPage selectProvisioningModel(GoogleCalculatorForm form) {
+        provisioningModelList.click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC,
+                String.format("//md-option[@value='%s']", form.getProvisioningModel().getValue()))
+                .click();
+        return this;
+    }
+
+    private GooglePricingCalculatorFormPage selectSeries(GoogleCalculatorForm form) {
+        seriesList.click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC,
+                String.format("//md-option[@value='%s']", form.getSeries().getValue()))
+                .click();
+        return this;
+    }
+
+    private GooglePricingCalculatorFormPage selectMachineType(GoogleCalculatorForm form) {
         machineTypeList.click();
-        createNewClickableElement(3, "//div[@class='md-text ng-binding'][contains(text(), 'n1-standard-8 (vCPUs: 8, RAM: 30GB)')]/parent::md-option")
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s']", form.getMachineType().getValue()))
                 .click();
         return this;
     }
@@ -117,43 +128,44 @@ public class GooglePricingCalculatorFormPage extends AbstractPage {
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectGPUType() {
+    private GooglePricingCalculatorFormPage selectGpuType(GoogleCalculatorForm form) {
         gpuTypeList.click();
-        createNewClickableElement(2, "//div[@class='md-text ng-binding'][contains(text(), 'Tesla P4')]/parent::md-option")
-                .click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s]", form.getGpuType().getValue())).click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectNumberOfGPUs() {
+    private GooglePricingCalculatorFormPage selectNumberOfGpus(GoogleCalculatorForm form) {
         numberOfGpusList.click();
-        createNewClickableElement(1, "//*[contains(text(), '1')]/parent::*[@id='select_option_477']")
-                .click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s'][contains(@ng-repeat, 'listingCtrl.computeServer.gpuType')]",
+                        form.getNumberOfGpu().getValue())).click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectLocalSsd() {
+    private GooglePricingCalculatorFormPage selectLocalSsd(GoogleCalculatorForm form) {
         localSsdList.click();
-        createNewClickableElement(1, "//div[@class='md-text ng-binding'][contains(text(), '2x375 GB')]/parent::md-option")
-                .click();
+        getElementWithClickableWait(WaitTimeouts.THREE_SEC,
+                String.format("//*[@value='%s'][@ng-repeat='item in listingCtrl.dynamicSsd.computeServer']",
+                        form.getLocalSsd().getValue())).click();
         return this;
     }
 
-    private GooglePricingCalculatorFormPage selectDataCenterLocation() {
+    private GooglePricingCalculatorFormPage selectDataCenterLocation(GoogleCalculatorForm form) {
         datacenterLocationList.click();
-        createNewClickableElement(1, "//div[@class='md-text ng-binding'][contains(text(), 'Frankfurt')]/parent::*[@id='select_option_228']")
-                .click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC, String.format("//*[@id='%s']",
+                form.getDatacenterLocation().getValue())).click();
         return this;
     }
 
-    private void selectCommittedUsage() {
+    private void selectCommittedUsage(GoogleCalculatorForm form) {
         committedUsageList.click();
-        createNewClickableElement(1, "//div[@class='md-text'][contains(text(), '1 Year')]/parent::*[@id='select_option_128']")
-                .click();
+        getElementWithClickableWait(WaitTimeouts.ONE_SEC, String.format("//*[@id='%s']",
+                form.getCommittedUsage().getValue())).click();
     }
 
     public GooglePricingCalculatorEstimatePage addToEstimate() {
         addToEstimateButton.submit();
         return new GooglePricingCalculatorEstimatePage(driver);
     }
-
 }
